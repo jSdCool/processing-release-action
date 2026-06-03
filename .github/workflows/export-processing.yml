@@ -170,6 +170,8 @@ jobs:
           if [[ "$RUNNER_OS" == "Linux" ]]; then
             PROCESSING_EXECUTABLE="$PROCESSING_HOME/bin/Processing"
           else
+            #the way the mac packgae is inspected for the jdk is tricky
+            cd $PROCESSING_HOME/..
             PROCESSING_EXECUTABLE="$PROCESSING_HOME/Contents/MacOS/Processing"
           fi
 

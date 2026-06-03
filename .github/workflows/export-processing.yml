@@ -70,15 +70,6 @@ jobs:
 
         # https://github.com/processing/processing4/releases/download/processing-1313-4.5.2/processing-4.5.2-windows-x64-portable.zip
 
-      - name: Debug Processing config environment
-        if: runner.os != 'Windows'
-        run: |
-            echo "HOME=$HOME"
-            echo "XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-<unset>}"
-            echo "SNAP_USER_COMMON=${SNAP_USER_COMMON:-<unset>}"
-
-            env | sort | grep -E '^(XDG|SNAP|HOME)'
-
 
       - name: Create Prefrences And Sketchbook Folder (Unix)
         if: runner.os != 'Windows'
@@ -94,6 +85,12 @@ jobs:
           #system specific prefrences folder
           if [[ "$RUNNER_OS" == "Linux" ]]; then 
             PREF_DIR="$HOME/.config/processing" 
+            ls $XDG_CONFIG_HOME -alp
+            RRED_DIR2=$XDG_CONFIG_HOME/processing
+            mkdir -p "$PREF_DIR2"
+            cat > "$PREF_DIR/preferences.txt" << EOF 
+            sketchbook.path.four=$SKETCHBOOK 
+            EOF
           else 
             PREF_DIR="$HOME/Library/Processing" 
           fi
@@ -141,6 +138,23 @@ jobs:
         run: |
           java -jar pdm.jar setup.depends
         
+      - name: Diagnotics
+        if: runner.os !='Windows'
+        shell: bash
+        run: |
+          echo $SKETCHBOOK
+          ls $SKETCHBOOK -alp
+          echo libs
+          ls $SKETCHBOOK/libraries -alp
+          if [[ "$RUNNER_OS" == "Linux" ]]; then 
+            PREF_DIR="$HOME/.config/processing" 
+            echo $PREF_DIR
+            ls $PREF_DIR -alp
+            cat $PREF_DIR/preferences.txt
+          else 
+            PREF_DIR="$HOME/Library/Processing" 
+            cat $PREF_DIR/preferences.txt
+          fi
 
 
       - name: Export Sketch (Unix)

@@ -239,6 +239,9 @@ jobs:
           Compress-Archive -Path "$env:EXPORT_DIR\*" -DestinationPath $ZipPath
 
           "ZIP_PATH=$ZipPath" | Out-File -FilePath $env:GITHUB_ENV -Append
+          
+          echo $ZipPath
+          ls $env:EXPORT_DIR
       
       - name: Upload Artifact
         uses: softprops/action-gh-release@v2

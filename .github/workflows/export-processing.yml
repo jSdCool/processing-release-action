@@ -94,7 +94,7 @@ jobs:
 
           # this here creates the prefrences file with just the sketchbook path in it, this is needed for the dependency manager to work correctly
           cat > "$PREF_DIR/preferences.txt" << EOF 
-          sketchbook.path.four=$SKETCHBOOK 
+          sketchbook.path.four=$SKETCHBOOK
           EOF
 
           echo "SKETCHBOOK=$SKETCHBOOK" >> "$GITHUB_ENV"

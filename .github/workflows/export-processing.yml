@@ -65,7 +65,7 @@ jobs:
 
           cd ..
           $dir = Get-ChildItem processing-download -Directory | Select-Object -First 1
-          "PROCESSING_HOME=$($dir.FullName)" | Out-File ` -FilePath $env:GITHUB_ENV ` -Append
+          "PROCESSING_HOME=$($dir.FullName)" | Out-File -FilePath $env:GITHUB_ENV -Append
 
 
         # https://github.com/processing/processing4/releases/download/processing-1313-4.5.2/processing-4.5.2-windows-x64-portable.zip
@@ -116,9 +116,7 @@ jobs:
           sketchbook.path=$Sketchbook 
           "@ | Set-Content (Join-Path $PrefDir "preferences.txt")
 
-          "SKETCHBOOK=$Sketchbook" | Out-File ` 
-          -FilePath $env:GITHUB_ENV ` 
-          -Append
+          "SKETCHBOOK=$Sketchbook" | Out-File  -FilePath $env:GITHUB_ENV -Append
 
       
       - name: Download Processing Dependency Manager

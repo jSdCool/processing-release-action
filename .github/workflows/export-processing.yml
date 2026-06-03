@@ -103,7 +103,7 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          $Sketchbook = "$env:RUNNER_TEMP\ProcessingSketchbook"
+          $Sketchbook = "$env:USERPROFILE\Documents\Processing"
           New-Item -ItemType Directory -Force "$Sketchbook\libraries" 
           New-Item -ItemType Directory -Force "$Sketchbook\tools" 
           New-Item -ItemType Directory -Force "$Sketchbook\modes"
@@ -234,7 +234,7 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          if (-not $(!Test-Path $ExportDir)) { 
+          if (-not $(Test-Path $ExportDir)) { 
             echo EXPORTED DIRECTORY DOES NOT EXIST
             FAIL CRASH!
           }

@@ -1,0 +1,220 @@
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  build:
+    permissions:
+      contents: write
+    
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            platform: windows-x64
+          - os: ubuntu-latest
+            platform: linux-x64
+          - os: macos-latest
+            platform: macos-x64
+            # future: arm version of mac and linux
+
+    runs-on: ${{ matrix.os }}
+    env:
+        PROCESSING_VERSION: 4.5.2
+        PROCESSING_RELEASE_TAG: processing-1313-4.5.2
+        SKETCH_NAME: release-test
+    # create and env for the platform name which is slightly diffrent from the os name
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Download Processing (Unix)
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          mkdir processing-download 
+          cd processing-download
+          curl -L \
+            -o processing.zip \
+            https://github.com/processing/processing4/releases/download/${{ env.PROCESSING_RELEASE_TAG }}/processing-${{ env.PROCESSING_VERSION }}-${{ matrix.platform }}-portable.zip
+
+          unzip processing.zip
+          # this could be a bit of a liability if other folders are arround
+          PROCESSING_DIR=$(find . -maxdepth 1 -type d | tail -n 1) 
+          # realpath does not exsist on stock macos
+          if [[ "$RUNNER_OS" == "Linux" ]]; then 
+            echo "PROCESSING_HOME=$(realpath "$PROCESSING_DIR")" >> "$GITHUB_ENV"
+          else
+            cd "$PROCESSING_DIR"
+            echo "PROCESSING_HOME=$(pwd -P)" >> "$GITHUB_ENV"
+          fi
+        
+      - name: Download Processing (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          mkdir processing-download 
+          cd processing-download
+          Invoke-WebRequest -Uri "https://github.com/processing/processing4/releases/download/${{ env.PROCESSING_RELEASE_TAG }}/processing-${{ env.PROCESSING_VERSION }}-${{ matrix.platform }}-portable.zip" -OutFile processing.zip
+          Expand-Archive -Path processing.zip -DestinationPath .
+
+          cd ..
+          $dir = Get-ChildItem processing-download -Directory | Select-Object -First 1
+          "PROCESSING_HOME=$($dir.FullName)" | Out-File ` -FilePath $env:GITHUB_ENV ` -Append
+
+
+        # https://github.com/processing/processing4/releases/download/processing-1313-4.5.2/processing-4.5.2-windows-x64-portable.zip
+
+      - name: Create Prefrences And Sketchbook Folder (Unix)
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          SKETCHBOOK="$RUNNER_TEMP/ProcessingSketchbook"
+
+          # create all the sketch book folders
+          mkdir -p "$SKETCHBOOK/libraries" 
+          mkdir -p "$SKETCHBOOK/tools" 
+          mkdir -p "$SKETCHBOOK/modes"
+
+          #system specific prefrences folder
+          if [[ "$RUNNER_OS" == "Linux" ]]; then 
+            PREF_DIR="$HOME/.processing" 
+          else 
+            PREF_DIR="$HOME/Library/Processing" 
+          fi
+          
+          mkdir -p "$PREF_DIR"
+
+          # this here creates the prefrences file with just the sketchbook path in it, this is needed for the dependency manager to work correctly
+          cat > "$PREF_DIR/preferences.txt" << EOF 
+          sketchbook.path.four=$SKETCHBOOK 
+          EOF
+
+          echo "SKETCHBOOK=$SKETCHBOOK" >> "$GITHUB_ENV"
+    
+      - name: Create Prefrences And Sketchbook Folder (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $Sketchbook = "$env:RUNNER_TEMP\ProcessingSketchbook"
+          New-Item -ItemType Directory -Force "$Sketchbook\libraries" 
+          New-Item -ItemType Directory -Force "$Sketchbook\tools" 
+          New-Item -ItemType Directory -Force "$Sketchbook\modes"
+
+          $PrefDir = Join-Path $env:APPDATA "Processing"
+
+          New-Item -ItemType Directory -Force $PrefDir
+
+          @" 
+          sketchbook.path=$Sketchbook 
+          "@ | Set-Content (Join-Path $PrefDir "preferences.txt")
+
+          "SKETCHBOOK=$Sketchbook" | Out-File ` 
+          -FilePath $env:GITHUB_ENV ` 
+          -Append
+
+      
+      - name: Download Processing Dependency Manager
+        shell: bash
+        run: |
+          curl -L \
+            -o pdm.jar \
+            https://github.com/jSdCool/Processing_dependancy_manager/releases/download/v-1.1.0/pdm.jar
+    
+      - name: Install Libraries
+        shell: bash
+        run: |
+          java -jar pdm.jar setup.depends
+        
+
+
+      - name: Export Sketch (Unix)
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          EXPORT_DIR="$RUNNER_TEMP/export"
+
+          pwd
+
+          if [[ "$RUNNER_OS" == "Linux" ]]; then
+            PROCESSING_EXECUTABLE="$PROCESSING_HOME/bin/processing"
+          else
+            PROCESSING_EXECUTABLE="$PROCESSING_HOME/Contents/MacOS/processing"
+          fi
+
+          "$PROCESSING_EXECUTABLE" cli\
+            --sketch=. \
+            --output="$EXPORT_DIR" \
+            --force \
+            --export
+
+            echo "EXPORT_DIR=$EXPORT_DIR" >> "$GITHUB_ENV"
+
+      - name: Export Sketch (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $ExportDir = "$env:RUNNER_TEMP\export"
+
+          &"$env:PROCESSING_HOME\processing.exe cli" --sketch=. --output="$ExportDir" --export
+
+          # processing-java returns immediately on Windows 
+          $TimeoutSeconds = 600 
+          $Elapsed = 0
+
+          while ($Elapsed -lt $TimeoutSeconds) { 
+            if (Test-Path $ExportDir) { 
+              Start-Sleep 5 
+              $Size1 = ( Get-ChildItem $ExportDir -Recurse | Measure-Object Length -Sum ).Sum 
+              
+              Start-Sleep 5 
+              
+              $Size2 = ( Get-ChildItem $ExportDir -Recurse | Measure-Object Length -Sum ).Sum 
+              
+              if ($Size1 -eq $Size2) { 
+                break 
+              } 
+            } 
+              
+            Start-Sleep 2 
+            $Elapsed += 2 
+          }
+
+          "EXPORT_DIR=$ExportDir" | Out-File -FilePath $env:GITHUB_ENV -Append
+
+      - name: Create Artifact Name
+        shell: bash
+        run: |
+          echo "ZIP_NAME=${SKETCH_NAME}-${{ matrix.platform }}.zip" >> "$GITHUB_ENV"
+
+      - name: Post Process
+        shell: bash
+        run: |
+          echo TODO more system specific things like moving the data folder on macos or renaming the execuable script!
+
+      - name: Zip Distrubution (Unix)
+        shell: bash
+        run: |
+          cd "$EXPORT_DIR"
+
+          zip -r "../$ZIP_NAME" .
+          echo "ZIP_PATH=$RUNNER_TEMP/$ZIP_NAME" >> "$GITHUB_ENV"
+
+      - name: Zip Distrubution (Windows)
+        shell: pwsh
+        run: |
+          $ZipPath = Join-Path $env:RUNNER_TEMP $env:ZIP_NAME
+
+          Compress-Archive -Path "$env:EXPORT_DIR\*" -DestinationPath $ZipPath
+
+          "ZIP_PATH=$ZipPath" | Out-File -FilePath $env:GITHUB_ENV -Append
+      
+      - name: Upload Artifact
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ env.ZIP_PATH }}

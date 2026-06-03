@@ -171,7 +171,9 @@ jobs:
             PROCESSING_EXECUTABLE="$PROCESSING_HOME/bin/Processing"
           else
             cd "$PROCESSING_HOME/Contents/app/resources"
-            ln -s jdk jdk-17
+            # mac is weird, it expects a folder named jdk-* but the included jdk is in jdk
+            mkdir jdk-17
+            cp -R jdk jdk-17
 
             
             PROCESSING_EXECUTABLE="$PROCESSING_HOME/Contents/MacOS/Processing"

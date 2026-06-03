@@ -133,23 +133,23 @@ jobs:
         run: |
           java -jar pdm.jar setup.depends
         
-      - name: Diagnotics
-        if: runner.os !='Windows'
-        shell: bash
-        run: |
-          echo $SKETCHBOOK
-          ls $SKETCHBOOK -alp
-          echo libs
-          ls $SKETCHBOOK/libraries -alp
-          if [[ "$RUNNER_OS" == "Linux" ]]; then 
-            PREF_DIR="$HOME/.config/processing" 
-            echo $PREF_DIR
-            ls $PREF_DIR -alp
-            cat $PREF_DIR/preferences.txt
-          else 
-            PREF_DIR="$HOME/Library/Processing" 
-            cat $PREF_DIR/preferences.txt
-          fi
+    #   - name: Diagnotics
+    #     if: runner.os !='Windows'
+    #     shell: bash
+    #     run: |
+    #       echo $SKETCHBOOK
+    #       ls $SKETCHBOOK -alp
+    #       echo libs
+    #       ls $SKETCHBOOK/libraries -alp
+    #       if [[ "$RUNNER_OS" == "Linux" ]]; then 
+    #         PREF_DIR="$HOME/.config/processing" 
+    #         echo $PREF_DIR
+    #         ls $PREF_DIR -alp
+    #         cat $PREF_DIR/preferences.txt
+    #       else 
+    #         PREF_DIR="$HOME/Library/Processing" 
+    #         cat $PREF_DIR/preferences.txt
+    #       fi
 
 
       - name: Export Sketch (Unix)
@@ -165,6 +165,12 @@ jobs:
           #ls $PROCESSING_HOME -alp
           #echo In bin
           #ls $PROCESSING_HOME/bin -alp
+
+          ls -la "$EXPORT_DIR" || true
+
+          if [ -e "$EXPORT_DIR" ]; then
+            echo "EXPORT_DIR already exists"
+          fi
 
           if [[ "$RUNNER_OS" == "Linux" ]]; then
             PROCESSING_EXECUTABLE="$PROCESSING_HOME/bin/Processing"

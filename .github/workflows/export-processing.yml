@@ -215,11 +215,7 @@ jobs:
         shell: bash
         run: |
           echo "ZIP_NAME=${SKETCH_NAME}-${{ matrix.platform }}.zip" >> "$GITHUB_ENV"
-          if (-not $(!Test-Path $ExportDir)) { 
-            echo EXPORTED DIRECTORY DOES NOT EXIST
-            FAIL CRASH!
-          }
-
+    
       - name: Post Process
         shell: bash
         run: |
@@ -238,6 +234,12 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
+          if (-not $(!Test-Path $ExportDir)) { 
+            echo EXPORTED DIRECTORY DOES NOT EXIST
+            FAIL CRASH!
+          }
+
+
           $ZipPath = Join-Path $env:RUNNER_TEMP $env:ZIP_NAME
 
           Compress-Archive -Path "$env:EXPORT_DIR\*" -DestinationPath $ZipPath

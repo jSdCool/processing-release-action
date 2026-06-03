@@ -166,7 +166,6 @@ jobs:
           #echo In bin
           #ls $PROCESSING_HOME/bin -alp
 
-          mkdir $EXPORT_DIR
 
           if [[ "$RUNNER_OS" == "Linux" ]]; then
             PROCESSING_EXECUTABLE="$PROCESSING_HOME/bin/Processing"
@@ -175,7 +174,7 @@ jobs:
           fi
 
           "$PROCESSING_EXECUTABLE" cli\
-            --sketch=. \
+            --sketch=$(pwd) \
             --output="$EXPORT_DIR" \
             --force \
             --export
@@ -187,8 +186,6 @@ jobs:
         shell: pwsh
         run: |
           $ExportDir = "$env:RUNNER_TEMP\export"
-
-          mkdir $ExportDir
 
           &"$env:PROCESSING_HOME\processing.exe cli" --sketch=. --output="$ExportDir" --export
 

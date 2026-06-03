@@ -70,6 +70,16 @@ jobs:
 
         # https://github.com/processing/processing4/releases/download/processing-1313-4.5.2/processing-4.5.2-windows-x64-portable.zip
 
+      - name: Debug Processing config environment
+        if: runner.os != 'Windows'
+        run: |
+            echo "HOME=$HOME"
+            echo "XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-<unset>}"
+            echo "SNAP_USER_COMMON=${SNAP_USER_COMMON:-<unset>}"
+
+            env | sort | grep -E '^(XDG|SNAP|HOME)'
+
+
       - name: Create Prefrences And Sketchbook Folder (Unix)
         if: runner.os != 'Windows'
         shell: bash

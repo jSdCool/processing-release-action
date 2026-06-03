@@ -15,8 +15,8 @@ jobs:
             platform: windows-x64
           - os: ubuntu-latest
             platform: linux-x64
-          - os: macos-latest
-            platform: macos-x64
+        #   - os: macos-latest
+        #     platform: macos-x64
             # future: arm version of mac and linux
 
     runs-on: ${{ matrix.os }}

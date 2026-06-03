@@ -215,6 +215,10 @@ jobs:
         shell: bash
         run: |
           echo "ZIP_NAME=${SKETCH_NAME}-${{ matrix.platform }}.zip" >> "$GITHUB_ENV"
+          if (-not $(!Test-Path $ExportDir)) { 
+            echo EXPORTED DIRECTORY DOES NOT EXIST
+            FAIL CRASH!
+          }
 
       - name: Post Process
         shell: bash

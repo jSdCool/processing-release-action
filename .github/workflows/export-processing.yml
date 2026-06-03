@@ -83,7 +83,7 @@ jobs:
 
           #system specific prefrences folder
           if [[ "$RUNNER_OS" == "Linux" ]]; then 
-            PREF_DIR="$HOME/.processing" 
+            PREF_DIR="$HOME/.config/processing" 
           else 
             PREF_DIR="$HOME/Library/Processing" 
           fi
@@ -140,6 +140,11 @@ jobs:
           EXPORT_DIR="$RUNNER_TEMP/export"
 
           pwd
+          ls
+          echo $EXPORT_DIR
+          echo $PROCESSING_HOME
+          ls $PROCESSING_HOME
+          ls $PROCESSING_HOME/bin
 
           if [[ "$RUNNER_OS" == "Linux" ]]; then
             PROCESSING_EXECUTABLE="$PROCESSING_HOME/bin/processing"

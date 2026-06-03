@@ -166,11 +166,7 @@ jobs:
           #echo In bin
           #ls $PROCESSING_HOME/bin -alp
 
-          ls -la "$EXPORT_DIR" || true
-
-          if [ -e "$EXPORT_DIR" ]; then
-            echo "EXPORT_DIR already exists"
-          fi
+          mkdir $EXPORT_DIR
 
           if [[ "$RUNNER_OS" == "Linux" ]]; then
             PROCESSING_EXECUTABLE="$PROCESSING_HOME/bin/Processing"
@@ -191,6 +187,8 @@ jobs:
         shell: pwsh
         run: |
           $ExportDir = "$env:RUNNER_TEMP\export"
+
+          mkdir $ExportDir
 
           &"$env:PROCESSING_HOME\processing.exe cli" --sketch=. --output="$ExportDir" --export
 

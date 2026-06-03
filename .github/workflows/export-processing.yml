@@ -86,11 +86,6 @@ jobs:
           if [[ "$RUNNER_OS" == "Linux" ]]; then 
             PREF_DIR="$HOME/.config/processing" 
             ls $XDG_CONFIG_HOME -alp
-            RRED_DIR2=$XDG_CONFIG_HOME/processing
-            mkdir -p "$PREF_DIR2"
-            cat > "$PREF_DIR/preferences.txt" << EOF 
-            sketchbook.path.four=$SKETCHBOOK 
-            EOF
           else 
             PREF_DIR="$HOME/Library/Processing" 
           fi

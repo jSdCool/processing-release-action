@@ -139,17 +139,18 @@ jobs:
         run: |
           EXPORT_DIR="$RUNNER_TEMP/export"
 
-          pwd
-          ls
-          echo $EXPORT_DIR
-          echo $PROCESSING_HOME
-          ls $PROCESSING_HOME
-          ls $PROCESSING_HOME/bin
+          #pwd
+          #ls
+          #echo $EXPORT_DIR
+          #echo $PROCESSING_HOME
+          #ls $PROCESSING_HOME -alp
+          #echo In bin
+          #ls $PROCESSING_HOME/bin -alp
 
           if [[ "$RUNNER_OS" == "Linux" ]]; then
-            PROCESSING_EXECUTABLE="$PROCESSING_HOME/bin/processing"
+            PROCESSING_EXECUTABLE="$PROCESSING_HOME/bin/Processing"
           else
-            PROCESSING_EXECUTABLE="$PROCESSING_HOME/Contents/MacOS/processing"
+            PROCESSING_EXECUTABLE="$PROCESSING_HOME/Contents/MacOS/Processing"
           fi
 
           "$PROCESSING_EXECUTABLE" cli\

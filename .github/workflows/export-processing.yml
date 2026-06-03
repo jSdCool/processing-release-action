@@ -170,17 +170,19 @@ jobs:
           if [[ "$RUNNER_OS" == "Linux" ]]; then
             PROCESSING_EXECUTABLE="$PROCESSING_HOME/bin/Processing"
           else
-            find "$PROCESSING_HOME" -name "jdk*" -type d
-
-            echo "$JAVA_TOOL_OPTIONS"
-            echo "$_JAVA_OPTIONS"
+            echo find jdk
+            find "$PROCESSING_HOME" -maxdepth 5 -type d | grep jdk
+            echo find resources
+            find "$PROCESSING_HOME" -maxdepth 5 -type d | grep Resources
+            echo list javahome
+            ls -lap /usr/libexec/java_home
             
             PROCESSING_EXECUTABLE="$PROCESSING_HOME/Contents/MacOS/Processing"
           fi
 
           "$PROCESSING_EXECUTABLE" cli --sketch=$SKETCH_PATH --output="$EXPORT_DIR" --force --export
 
-            echo "EXPORT_DIR=$EXPORT_DIR" >> "$GITHUB_ENV"
+          echo "EXPORT_DIR=$EXPORT_DIR" >> "$GITHUB_ENV"
 
       - name: Export Sketch (Windows)
         if: runner.os == 'Windows'

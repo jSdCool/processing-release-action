@@ -166,6 +166,8 @@ jobs:
           #echo In bin
           #ls $PROCESSING_HOME/bin -alp
 
+          SKETCH_PATH=$(pwd)
+
 
           if [[ "$RUNNER_OS" == "Linux" ]]; then
             PROCESSING_EXECUTABLE="$PROCESSING_HOME/bin/Processing"
@@ -175,7 +177,7 @@ jobs:
             PROCESSING_EXECUTABLE="$PROCESSING_HOME/Contents/MacOS/Processing"
           fi
 
-          "$PROCESSING_EXECUTABLE" cli --sketch=$(pwd) --output="$EXPORT_DIR" --force --export
+          "$PROCESSING_EXECUTABLE" cli --sketch=$SKETCH_PATH --output="$EXPORT_DIR" --force --export
 
             echo "EXPORT_DIR=$EXPORT_DIR" >> "$GITHUB_ENV"
 

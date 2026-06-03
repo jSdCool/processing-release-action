@@ -183,9 +183,9 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          $ExportDir = "$env:RUNNER_TEMP\export"
+          $ExportDir = "$env:RUNNER_TEMP\export" 
 
-          &"$env:PROCESSING_HOME\processing.exe cli" --sketch=$(pwd) --output="$ExportDir" --export
+          &$env:PROCESSING_HOME\processing.exe cli --sketch=$(pwd) --output="$ExportDir" --export
 
           # processing-java returns immediately on Windows 
           $TimeoutSeconds = 600 

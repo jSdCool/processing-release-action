@@ -1,0 +1,6 @@
+// dependancy file for processing dependecy manager [link]
+
+//install processing's sound library
+plib {
+	name Sound
+}

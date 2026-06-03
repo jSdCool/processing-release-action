@@ -23,7 +23,7 @@ jobs:
     env:
         PROCESSING_VERSION: 4.5.2
         PROCESSING_RELEASE_TAG: processing-1313-4.5.2
-        SKETCH_NAME: release-test
+        SKETCH_NAME: release_test
     # create and env for the platform name which is slightly diffrent from the os name
     steps:
       - uses: actions/checkout@v4

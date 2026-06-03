@@ -173,11 +173,7 @@ jobs:
             PROCESSING_EXECUTABLE="$PROCESSING_HOME/Contents/MacOS/Processing"
           fi
 
-          "$PROCESSING_EXECUTABLE" cli\
-            --sketch=$(pwd) \
-            --output="$EXPORT_DIR" \
-            --force \
-            --export
+          "$PROCESSING_EXECUTABLE" cli --sketch=$(pwd) --output="$EXPORT_DIR" --force --export
 
             echo "EXPORT_DIR=$EXPORT_DIR" >> "$GITHUB_ENV"
 
@@ -187,7 +183,7 @@ jobs:
         run: |
           $ExportDir = "$env:RUNNER_TEMP\export"
 
-          &"$env:PROCESSING_HOME\processing.exe cli" --sketch=. --output="$ExportDir" --export
+          &"$env:PROCESSING_HOME\processing.exe cli" --sketch=$(pwd) --output="$ExportDir" --export
 
           # processing-java returns immediately on Windows 
           $TimeoutSeconds = 600 
@@ -224,6 +220,7 @@ jobs:
           echo TODO more system specific things like moving the data folder on macos or renaming the execuable script!
 
       - name: Zip Distrubution (Unix)
+        if: runner.os != 'Windows'
         shell: bash
         run: |
           cd "$EXPORT_DIR"
@@ -232,6 +229,7 @@ jobs:
           echo "ZIP_PATH=$RUNNER_TEMP/$ZIP_NAME" >> "$GITHUB_ENV"
 
       - name: Zip Distrubution (Windows)
+        if: runner.os == 'Windows'
         shell: pwsh
         run: |
           $ZipPath = Join-Path $env:RUNNER_TEMP $env:ZIP_NAME

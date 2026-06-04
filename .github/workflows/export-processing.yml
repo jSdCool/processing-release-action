@@ -171,9 +171,15 @@ jobs:
             PROCESSING_EXECUTABLE="$PROCESSING_HOME/bin/Processing"
           else
             cd "$PROCESSING_HOME/Contents/app/resources"
-            # mac is weird, it expects a folder named jdk-* but the included jdk is in jdk
-            mkdir jdk-17
-            cp -R jdk jdk-17
+            # mac is weird, its jdk inclusion code is currently broken
+            JDK_HOME=$(/usr/libexec/java_home)
+
+            echo "Using JDK: $JDK_HOME"
+
+            # Target must match what Processing expects
+            RESOURCE_DIR="$PROCESSING_HOME/Contents/app/resources"
+            # Copy as the name Processing expects (IMPORTANT: jdk-17, not jdk)
+            cp -R "$JDK_HOME" "$RESOURCE_DIR/jdk-17"
 
             
             PROCESSING_EXECUTABLE="$PROCESSING_HOME/Contents/MacOS/Processing"

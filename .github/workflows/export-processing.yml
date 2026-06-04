@@ -32,6 +32,7 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
+          architecture: x64
 
       - name: Download Processing (Unix)
         if: runner.os != 'Windows'
@@ -180,7 +181,10 @@ jobs:
             RESOURCE_DIR="$PROCESSING_HOME/Contents/app/resources"
             # Copy as the name Processing expects (IMPORTANT: jdk-17, not jdk)
             cp -R "$JDK_BUNDLE/../.." "$RESOURCE_DIR/jdk-17"
-
+            #this folder in specific cuases poroblems so just delete it
+            rm -rf "$RESOURCE_DIR/jdk-17/Contents/Home/legal"
+            #mkae theese files modifiable
+            chmod -R u+rwX "$RESOURCE_DIR/jdk-17"
             
             PROCESSING_EXECUTABLE="$PROCESSING_HOME/Contents/MacOS/Processing"
           fi
@@ -188,6 +192,8 @@ jobs:
           "$PROCESSING_EXECUTABLE" cli --sketch=$SKETCH_PATH --output="$EXPORT_DIR" --force --export
 
           echo "EXPORT_DIR=$EXPORT_DIR" >> "$GITHUB_ENV"
+
+
 
       - name: Export Sketch (Windows)
         if: runner.os == 'Windows'

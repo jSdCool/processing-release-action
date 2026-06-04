@@ -172,14 +172,14 @@ jobs:
           else
             cd "$PROCESSING_HOME/Contents/app/resources"
             # mac is weird, its jdk inclusion code is currently broken
-            JDK_HOME=$(/usr/libexec/java_home)
+            JDK_BUNDLE=$(/usr/libexec/java_home -v 17 --failfast)
 
-            echo "Using JDK: $JDK_HOME"
+            echo "JDK bundle: $JDK_BUNDLE"
 
             # Target must match what Processing expects
             RESOURCE_DIR="$PROCESSING_HOME/Contents/app/resources"
             # Copy as the name Processing expects (IMPORTANT: jdk-17, not jdk)
-            cp -R "$JDK_HOME" "$RESOURCE_DIR/jdk-17"
+            cp -R "$JDK_BUNDLE/../.." "$RESOURCE_DIR/jdk-17"
 
             
             PROCESSING_EXECUTABLE="$PROCESSING_HOME/Contents/MacOS/Processing"
